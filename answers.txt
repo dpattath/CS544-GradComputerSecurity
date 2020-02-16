@@ -1,0 +1,22 @@
+## Daniel Pattathil dp865 170004119
+
+Exploit 2a: This exploit utilizes a reqpath overload in order to overwrite
+information above in the stack. I simply created an arbitrarily long garbage
+string which would cause the return address to be invalid.
+
+Exploit 2b: This exploit utilizes the header parsing overload to overload
+information above it in the stack. This created the same issue as above
+
+Exploit 3: I chose to continue with the header parsing overload. I saw that
+the array I wanted to overload was value simply for easier math. I could have
+also chosen to overload envvar. The math I needed to figure out was primarily
+where char* value pointed to and where $ebp was located in memory. I found that
+value was at 0xbffff384 and that $ebp was at 0xbffff180 which gave me that the
+offset would need to be (decimal) 532, so I included that many char's of 
+overflow. Then, I realized that I was having issues actually redirecting the
+program counter, so I followed the suggestion from the papers to repeat the
+desired Return Address a few times. This allowed me to point to where my code
+was in the stack.
+
+[---------envvar---------][---------value---------][colon][sp][i][$ebp] 
+      (unaffected)           "HHHHH" code "HHHHHHHHHHHHHHHHHHHH" &code

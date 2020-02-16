@@ -1,0 +1,42 @@
+# Daniel Pattathil dp865 170004119
+# [file:#lines]
+# desc
+#
+
+[http.c:94]
+we can put too much information inside of the HTTP Request and
+overflow through the env, we are taking advantage of sprintf's
+
+    envp += sprintf(envp, "REQUEST_METHOD=%s", buf) + 1;
+    envp += sprintf(envp, "SERVER_PROTOCOL=%s", sp2) + 1;
+
+[http.c:105]
+if we have a long requested path, we can overflow reqpath based
+
+    url_decode(reqpath, sp1);
+
+[http.c:159]
+we can use the same url_decode in the HTTP header parsing and take
+the header value to overflow the "value" array into RA's
+
+    url_decode(value, sp);
+
+[http.c:165]
+we can use the sprintf in http header parsing to overflow the envvar
+array into the RA's
+
+    sprintf(envvar, "HTTP_%s", buf);
+
+[http.c:282]
+if we have a long request URI, we can use the "name" argument of 
+http_serve to overwrite the handler pointer or overflow pn
+
+    void (*handler)(int, const char *) = http_serve_none;
+    char pn[1024];
+    strcat(pn, name);
+    handler(fd, pn);
+
+[zookd.c:118]
+if we had a way to change the envvar, we can use the previous vuln
+
+    http_serve(fd, getenv("REQUEST_URI"));
